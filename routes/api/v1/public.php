@@ -9,4 +9,7 @@ Route::get('/users', function () {
     return response()->json($users);
 });
 
-Route::post('/login', [AuthenticationController::class , 'login'])->name('login');
+Route::controller(AuthenticationController::class)->group(function () {
+    Route::post('/register', 'register')->name('register');
+    Route::post('/login', 'login')->name('login');
+});
