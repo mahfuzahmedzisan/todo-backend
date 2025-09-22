@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\VerifiedUserMiddleware;
+use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function () {
-            Route::middleware(['auth:api'])
+            Route::middleware(['auth'])
                 ->prefix('api/v1')
                 ->name('api.v1.')
                 ->group(base_path('routes/api/v1/private.php'));
@@ -23,7 +25,10 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'auth' => Authenticate::class,
+            'email-verified' => VerifiedUserMiddleware::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

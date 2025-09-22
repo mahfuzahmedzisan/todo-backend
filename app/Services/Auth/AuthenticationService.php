@@ -81,4 +81,8 @@ class AuthenticationService
             'message' => 'OTP resent successfully.',
         ];
     }
+    public function resetPassword(User $user, string $password): void
+    {
+        $user->update(['password' => bcrypt($password)]);
+    }
 }
