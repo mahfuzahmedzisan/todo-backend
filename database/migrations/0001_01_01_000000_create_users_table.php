@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -22,7 +23,7 @@ return new class extends Migration
             $table->string('otp', 4)->nullable();
             $table->dateTime('otp_sent_at')->nullable();
             $table->dateTime('otp_expires_at')->nullable();
-            $table->boolean('is_admin')->index()->default(false);
+            $table->boolean('is_admin')->index()->default(User::NOT_ADMIN);
 
             $table->timestamps();
         });

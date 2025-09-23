@@ -68,7 +68,10 @@ class User extends Authenticatable implements OAuthenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
+
+    public const ADMIN = 1;
+    public const NOT_ADMIN = 0;
 }
