@@ -29,7 +29,7 @@ class TodoManagementController extends Controller
             }
 
 
-            $todos = $query->get();
+            $todos = $query->paginate(3);
 
             return sendResponse(true, 'Todos fetched successfully.', $todos, Response::HTTP_OK);
         } catch (\Throwable $e) {
