@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Todo;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,13 +17,13 @@ return new class extends Migration
 
             $table->string('title')->index();
             $table->text('description');
-            $table->boolean('completed')->default(false);
+            $table->boolean('is_completed')->default(Todo::NOT_COMPLETED);
             $table->unsignedBigInteger('user_id')->index();
             $table->dateTime('due_date')->nullable();
             $table->dateTime('completed_at')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
-            $table->index(['completed', 'created_at']);
+            $table->index(['is_completed', 'created_at']);
             $table->timestamps();
         });
     }

@@ -4,24 +4,27 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Todo extends Model
 {
+    use HasFactory;
+
     protected $with = [
         'user',
     ];
     protected $fillable = [
         'title',
         'description',
-        'completed',
+        'is_completed',
         'user_id',
         'due_date',
         'completed_at',
     ];
 
     protected $casts = [
-        'completed' => 'boolean',
+        'is_completed' => 'boolean',
         'due_date' => 'datetime',
         'completed_at' => 'datetime',
     ];
@@ -36,12 +39,20 @@ class Todo extends Model
 
     public function scopeCompleted(Builder $query): Builder
     {
-        return $query->where('completed', self::COMPLETED);
+        return $query->where('is_completed', self::COMPLETED);
     }
 
     public function scopeNotCompleted(Builder $query): Builder
     {
-        return $query->where('completed', self::NOT_COMPLETED);
+    return $query->where('is_completed', self::NOT_COMPLETED);
+    }
+
+    public function scopeWhereLike($query, $search)
+    {
+        $query->where(function ($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%$search%");
+        });
     }
 
     protected $appends = [
