@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\API\V1\BulkDeleteTodoRequest;
 use App\Http\Requests\API\V1\TodoRequest;
 use App\Models\Todo;
 use Illuminate\Http\Request;
@@ -36,7 +37,7 @@ class TodoManagementController extends Controller
             return sendResponse(false, 'Something went wrong.', null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    public function todo(Request $request, $id)
+    public function todo($id)
     {
         try {
             $user = request()->user();
@@ -89,7 +90,7 @@ class TodoManagementController extends Controller
             return sendResponse(false, 'Something went wrong.', null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    public function deleteTodo(Request $request, $id)
+    public function deleteTodo($id)
     {
         try {
             $user = request()->user();
@@ -107,7 +108,23 @@ class TodoManagementController extends Controller
             return sendResponse(false, 'Something went wrong.', null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    public function completeTodo(Request $request, $id)
+    public function bulkDeleteTodo(BulkDeleteTodoRequest $request)
+    {
+        try {
+            $user = request()->user();
+            if (!$user) {
+                return sendResponse(false, 'Unauthorized', null, Response::HTTP_UNAUTHORIZED);
+            }
+            $ids = $request->validated('ids');
+            $query = Todo::where('user_id', $user->id)->whereIn('id', $ids);
+            $query->delete();
+            return sendResponse(true, 'Todos deleted successfully.', null, Response::HTTP_OK);
+        } catch (\Throwable $e) {
+            Log::error('Bulk Delete Todo Error: ' . $e->getMessage());
+            return sendResponse(false, 'Something went wrong.', null, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    public function completeTodo($id)
     {
         try {
             $user = request()->user();
@@ -125,7 +142,7 @@ class TodoManagementController extends Controller
             return sendResponse(false, 'Something went wrong.', null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    public function incompleteTodo(Request $request, $id)
+    public function incompleteTodo($id)
     {
         try {
             $user = request()->user();
@@ -143,7 +160,7 @@ class TodoManagementController extends Controller
             return sendResponse(false, 'Something went wrong.', null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    public function dueTodo(Request $request, $id)
+    public function dueTodo($id)
     {
         try {
             $user = request()->user();
