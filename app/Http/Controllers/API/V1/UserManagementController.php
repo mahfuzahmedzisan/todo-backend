@@ -18,6 +18,7 @@ class UserManagementController extends Controller
         $this->userService = $userService;
     }
 
+
     public function users()
     {
         try {

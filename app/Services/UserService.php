@@ -12,8 +12,8 @@ class UserService
         return User::all();
     }
 
-    public function getUserByField($value, $field = 'email'): User
+    public function getUserByField($value, $field = 'email')
     {
-        return User::where($field, $value)->first();
+        return User::where($field, $value);
     }
 }

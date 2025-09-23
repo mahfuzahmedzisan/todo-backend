@@ -9,6 +9,7 @@ use App\Http\Requests\API\V1\Auth\OtpResentRequest;
 use App\Http\Requests\API\V1\Auth\OtpVerifyRequest;
 use App\Http\Requests\API\V1\Auth\RegisterRequest;
 use App\Http\Requests\API\V1\Auth\ResetPasswordRequest;
+use App\Http\Resources\Api\V1\UserResource;
 use App\Models\User;
 use App\Services\Auth\AuthenticationService;
 use App\Services\UserService;
@@ -39,7 +40,7 @@ class AuthenticationController extends Controller
                 $token = $user->createToken('authToken')->accessToken;
                 $this->authService->generateOtp($user);
                 return sendResponse(true, 'User registered successfully. Please verify your email', [
-                    'user' => $user,
+                    'user' => new UserResource($user),
                     'token' => $token,
                     'token_type' => 'Bearer',
                 ], Response::HTTP_CREATED);
@@ -53,16 +54,11 @@ class AuthenticationController extends Controller
     {
         try {
             $credentials = $request->only('email', 'password');
-
             if (Auth::attempt($credentials)) {
-                $user = $this->userService->getUserByField($credentials['email'], 'email')->first();
-                if (! $user && Hash::check($request->password, $user->password)) {
-                    return sendResponse(false, 'Invalid credentials', null, Response::HTTP_NOT_FOUND);
-                }
+                $user = Auth::user();
                 $token = $user->createToken('authToken')->accessToken;
-
                 return sendResponse(true, 'Login successful', [
-                    'user' => $user,
+                    'user' => new UserResource($user),
                     'token' => $token,
                     'token_type' => 'Bearer',
                 ]);
@@ -71,7 +67,21 @@ class AuthenticationController extends Controller
             }
         } catch (Throwable $e) {
             Log::error('Login Error: ' . $e->getMessage());
-            return sendResponse(false, 'Login failed', null, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return sendResponse(false, 'Login failed', $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function logout(Request $request)
+    {
+        try {
+            if ($request->user() && $request->user()->token()) {
+                $request->user()->token()->delete();
+                return sendResponse(true, 'Logout successful', null, Response::HTTP_OK);
+            }
+            return sendResponse(false, 'Logout failed', null, Response::HTTP_UNAUTHORIZED);
+        } catch (Throwable $e) {
+            Log::error('Logout Error: ' . $e->getMessage());
+            return sendResponse(false, 'Logout failed', null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -81,7 +91,7 @@ class AuthenticationController extends Controller
         try {
             $user = $this->userService->getUserByField($request->validated('email'), 'email')->first();
             if (!$user) {
-                return sendResponse(false, 'User not found.', null, Response::HTTP_NOT_FOUND);
+                return sendResponse(false, 'Invalid credentials.', null, Response::HTTP_NOT_FOUND);
             }
             if ($this->authService->verifyOtp($user, $request->validated('otp'))) {
                 return sendResponse(true, 'Email verified successfully.', null);
@@ -101,7 +111,7 @@ class AuthenticationController extends Controller
     {
         $user = $this->userService->getUserByField($request->validated('email'), 'email')->first();
         if (!$user) {
-            return sendResponse(false, 'User not found.', null, Response::HTTP_NOT_FOUND);
+            return sendResponse(false, 'Invalid credentials.', null, Response::HTTP_NOT_FOUND);
         };
         $result = $this->authService->resendOtp($user);
         if ($result['blocked']) {
@@ -115,7 +125,7 @@ class AuthenticationController extends Controller
         try {
             $user = $this->userService->getUserByField($request->validated('email'), 'email')->first();
             if (!$user) {
-                return sendResponse(false, 'User not found.', null, Response::HTTP_NOT_FOUND);
+                return sendResponse(false, 'Invalid credentials.', null, Response::HTTP_NOT_FOUND);
             };
             $this->authService->generateOtp($user);
             $token = Password::createToken($user);
@@ -130,7 +140,7 @@ class AuthenticationController extends Controller
         try {
             $user = $this->userService->getUserByField($request->validated('email'), 'email')->first();
             if (!$user) {
-                return sendResponse(false, 'User not found.', null, Response::HTTP_NOT_FOUND);
+                return sendResponse(false, 'Invalid credentials.', null, Response::HTTP_NOT_FOUND);
             };
             if (!Password::tokenExists($user, $request->token)) {
                 return sendResponse(false, 'Invalid or expired reset token.', [

@@ -24,6 +24,7 @@ return new class extends Migration
             $table->dateTime('otp_sent_at')->nullable();
             $table->dateTime('otp_expires_at')->nullable();
             $table->boolean('is_admin')->index()->default(User::NOT_ADMIN);
+            $table->timestamp('last_synced_at')->nullable();
 
             $table->timestamps();
         });
