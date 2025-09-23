@@ -37,7 +37,8 @@ class AuthenticationController extends Controller
             return DB::transaction(function () use ($request) {
                 $user = User::create($request->validated());
                 $token = $user->createToken('authToken')->accessToken;
-                return sendResponse(true, 'User registered successfully', [
+                $this->authService->generateOtp($user);
+                return sendResponse(true, 'User registered successfully. Please verify your email', [
                     'user' => $user,
                     'token' => $token,
                     'token_type' => 'Bearer',

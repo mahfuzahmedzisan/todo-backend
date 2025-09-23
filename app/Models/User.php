@@ -24,6 +24,10 @@ class User extends Authenticatable implements OAuthenticatable
         'name',
         'email',
         'password',
+        'is_admin',
+        'otp',
+        'otp_sent_at',
+        'otp_expires_at',
     ];
 
     /**
@@ -34,6 +38,9 @@ class User extends Authenticatable implements OAuthenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'otp',
+        'otp_sent_at',
+        'otp_expires_at',
     ];
 
     /**
@@ -46,6 +53,10 @@ class User extends Authenticatable implements OAuthenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
+            'otp' => 'string',
+            'otp_sent_at' => 'datetime',
+            'otp_expires_at' => 'datetime',
         ];
     }
 
