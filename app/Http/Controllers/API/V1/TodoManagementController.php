@@ -18,7 +18,18 @@ class TodoManagementController extends Controller
             if (!$user) {
                 return sendResponse(false, 'Unauthorized', null, Response::HTTP_UNAUTHORIZED);
             }
-            $todos = Todo::where('user_id', $user->id)->get();
+            $query = Todo::where('user_id', $user->id);
+
+            if ($request->has('completed')) {
+                $query->completed();
+            }
+            if ($request->has('not_completed')) {
+                $query->notCompleted();
+            }
+
+
+            $todos = $query->get();
+
             return sendResponse(true, 'Todos fetched successfully.', $todos, Response::HTTP_OK);
         } catch (\Throwable $e) {
             Log::error('Get Todos Error: ' . $e->getMessage());
@@ -42,6 +53,7 @@ class TodoManagementController extends Controller
             return sendResponse(false, 'Something went wrong.', null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
     public function createTodo(TodoRequest $request)
     {
         try {
@@ -50,6 +62,7 @@ class TodoManagementController extends Controller
             if (!$user) {
                 return sendResponse(false, 'Unauthorized', null, Response::HTTP_UNAUTHORIZED);
             }
+            $validated['user_id'] = $user->id;
             $todo = Todo::create($validated);
             return sendResponse(true, 'Todo created successfully.', $todo, Response::HTTP_CREATED);
         } catch (\Throwable $e) {

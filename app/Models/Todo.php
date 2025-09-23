@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Todo extends Model
@@ -33,14 +34,14 @@ class Todo extends Model
     public const COMPLETED = 1;
     public const NOT_COMPLETED = 0;
 
-    public function completed(): bool
+    public function scopeCompleted(Builder $query): Builder
     {
-        return $this->completed == self::COMPLETED;
+        return $query->where('completed', self::COMPLETED);
     }
 
-    public function notCompleted(): bool
+    public function scopeNotCompleted(Builder $query): Builder
     {
-        return $this->completed == self::NOT_COMPLETED;
+        return $query->where('completed', self::NOT_COMPLETED);
     }
 
     protected $appends = [

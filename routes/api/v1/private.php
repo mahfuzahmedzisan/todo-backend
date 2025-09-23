@@ -16,6 +16,8 @@ Route::controller(UserController::class)->group(function () {
 Route::controller(TodoManagementController::class)->group(function () {
     Route::group(['prefix' => '/me', 'as' => 'me.'], function () {
         Route::get('/todos', 'todos')->name('todos');
+        Route::get('/todos/{id}', 'todo')->name('todo');
+        Route::get('/todos/due', 'dueTodos')->name('dueTodos');
         Route::post('/todos', 'createTodo')->name('createTodo');
         Route::put('/todos/{id}', 'updateTodo')->name('updateTodo');
         Route::delete('/todos/{id}', 'deleteTodo')->name('deleteTodo');

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -77,7 +78,6 @@ class User extends Authenticatable implements OAuthenticatable, MustVerifyEmail
 
     // Appends 
     protected $appends = [
-        'initials',
         'is_verified',
         'created_at_formatted',
         'updated_at_formatted',
@@ -87,19 +87,19 @@ class User extends Authenticatable implements OAuthenticatable, MustVerifyEmail
     public const ADMIN = 1;
     public const NOT_ADMIN = 0;
 
-    public function admin(): bool
+    public function scopeAdmin(Builder $query): Builder
     {
-        return $this->is_admin == self::ADMIN;
+        return $query->where('is_admin', self::ADMIN);
     }
 
-    public function notAdmin(): bool
+    public function scopeNotAdmin(Builder $query): Builder
     {
-        return $this->is_admin == self::NOT_ADMIN;
+        return $query->where('is_admin', self::NOT_ADMIN);
     }
 
-    public function isVerified(): bool
+    public function scopeVerified(Builder $query): Builder
     {
-        return $this->email_verified_at !== null;
+        return $query->whereNotNull('email_verified_at');
     }
 
     // Attributes 

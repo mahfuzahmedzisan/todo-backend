@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->string('title')->index();
-            $table->text('description')->index();
+            $table->text('description');
             $table->boolean('completed')->default(false);
             $table->unsignedBigInteger('user_id')->index();
             $table->dateTime('due_date')->nullable();
