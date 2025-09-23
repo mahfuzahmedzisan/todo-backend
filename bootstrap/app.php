@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function () {
-            Route::middleware(['auth:api', 'verified-user'])
+            Route::middleware(['auth:api'])
                 ->prefix('api/v1')
                 ->name('api.v1.')
                 ->group(base_path('routes/api/v1/private.php'));
