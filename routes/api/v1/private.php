@@ -7,6 +7,7 @@ use App\Http\Controllers\API\V1\UserManagementController as UserController;
 
 Route::controller(AuthenticationController::class)->group(function () {
     Route::post('/logout', 'logout')->name('logout');
+    Route::post('/refresh', 'refresh')->name('refresh');
 });
 
 Route::controller(UserController::class)->group(function () {

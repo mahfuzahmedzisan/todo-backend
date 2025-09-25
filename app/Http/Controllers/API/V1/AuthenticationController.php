@@ -75,13 +75,31 @@ class AuthenticationController extends Controller
     {
         try {
             if ($request->user() && $request->user()->token()) {
-                $request->user()->token()->delete();
+                $request->user()->token()->revoke();
                 return sendResponse(true, 'Logout successful', null, Response::HTTP_OK);
             }
             return sendResponse(false, 'Logout failed', null, Response::HTTP_UNAUTHORIZED);
         } catch (Throwable $e) {
             Log::error('Logout Error: ' . $e->getMessage());
             return sendResponse(false, 'Logout failed', null, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function refresh(Request $request)
+    {
+        try {
+            $user = $request->user();
+            if (!$user) {
+                return sendResponse(false, 'Unauthorized', null, Response::HTTP_UNAUTHORIZED);
+            }
+            $token = $user->createToken('authToken')->accessToken;
+            return sendResponse(true, 'Token refreshed successfully', [
+                'token' => $token,
+                'token_type' => 'Bearer',
+            ], Response::HTTP_OK);
+        } catch (Throwable $e) {
+            Log::error('Token Refresh Error: ' . $e->getMessage());
+            return sendResponse(false, 'Token refresh failed', null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
