@@ -20,13 +20,14 @@ return [
     'allowed_methods' => ['*'],
 
     // Default 
-    // 'allowed_origins' => ['*'],
+    'allowed_origins' => ['*'],
 
-    'allowed_origins' => [
-        'http://localhost:5173',
-        'http://127.0.0.1:5173',
-        'http://localhost:3000', // Add other frontend URLs as needed
-    ],
+    // Add frontend URLs for CORS to allow requests from them
+    // 'allowed_origins' => [
+    //     'http://localhost:5173',
+    //     'http://127.0.0.1:5173',
+    //     'http://localhost:3000', // Add other frontend URLs as needed
+    // ],
 
     'allowed_origins_patterns' => [],
 
@@ -36,7 +37,7 @@ return [
 
     'max_age' => 0,
 
-    // default false 
+    // default false | true for access control allow credentials
     'supports_credentials' => true,
 
 ];
